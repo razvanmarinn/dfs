@@ -21,7 +21,7 @@ func (wn *WorkerNode) HealthCheck() bool {
 
 func (w *WorkerNode) SendBatch(ctx context.Context, req *pb.BatchRequest) (*pb.BatchResponse, error) {
 	batchID := req.BatchId.Value
-	w.receivedBatches[batchID] = req.BatchData
+	w.ReceivedBatches[batchID] = req.BatchData
 	log.Printf("Received and stored batch ID: %s, Data length: %d", batchID, len(req.BatchData))
 
 	return &pb.BatchResponse{

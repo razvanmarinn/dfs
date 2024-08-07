@@ -11,14 +11,13 @@ import (
 	pb "github.com/razvanmarinn/dfs/proto"
 
 	"github.com/google/uuid"
+	"github.com/razvanmarinn/dfs/internal/load_balancer"
 	"github.com/razvanmarinn/dfs/internal/nodes"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 const inputDir = "../../input/"
 
-func processFiles(server *nodes.MasterNode, client pb.BatchServiceClient) {
+func processFiles(server *nodes.MasterNode, lb *load_balancer.LoadBalancer) {
 	entries, err := os.ReadDir(inputDir)
 	if err != nil {
 		log.Printf("error reading directory: %v\n", err)
@@ -51,6 +50,8 @@ func processFiles(server *nodes.MasterNode, client pb.BatchServiceClient) {
 			}
 
 			log.Printf("Sending batch %s for file %s (size: %d bytes)", batchID, fileName, len(batchData))
+			_, client := lb.GetNextClient()
+
 			success, worker_id := sendBatch(client, batchID, batchData)
 			if success {
 				log.Printf("Successfully sent batch %s for file %s", batchID, fileName)
@@ -93,24 +94,17 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to create temp directory: %v", err)
 	}
-	defer os.RemoveAll(tempDir) 
+	defer os.RemoveAll(tempDir)
 
 	server := nodes.NewMasterNode(tempDir)
 	server.Start()
 
-	conn, err := grpc.Dial("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithDefaultCallOptions(
-		grpc.MaxCallRecvMsgSize(64*1024*1024), 
-		grpc.MaxCallSendMsgSize(64*1024*1024), 
-	))
-	if err != nil {
-		log.Fatalf("did not connect: %v", err)
-	}
-	defer conn.Close()
-	log.Println("Successfully connected to worker node")
+	numWorkers := 3
+	basePort := 50051
+	lb := load_balancer.NewLoadBalancer(numWorkers, basePort)
+	defer lb.Close()
 
-	client := pb.NewBatchServiceClient(conn)
-
-	processFiles(server, client)
+	processFiles(server, lb)
 
 	for fileName, batchIDs := range server.GetFiles() {
 		fmt.Printf("File: %s\n", fileName)

@@ -17,32 +17,30 @@ type Node interface {
 }
 
 type MasterNode struct {
-    files          map[string][]uuid.UUID
-    batchLocations map[uuid.UUID][]string
-    batchDir       string
-    lock           sync.Mutex
+	files          map[string][]uuid.UUID
+	batchLocations map[uuid.UUID][]string
+	batchDir       string
+	lock           sync.Mutex
 }
 
 type WorkerNode struct {
-	ID   string
-	lock sync.Mutex
-    receivedBatches map[string][]byte
+	ID              string
+	lock            sync.Mutex
+	ReceivedBatches map[string][]byte
 	pb.UnimplementedBatchServiceServer
 }
 
-
 func NewMasterNode(batchDir string) *MasterNode {
-    return &MasterNode{
-        files:          make(map[string][]uuid.UUID),
-        batchLocations: make(map[uuid.UUID][]string),
-        batchDir:       batchDir,
-    }
+	return &MasterNode{
+		files:          make(map[string][]uuid.UUID),
+		batchLocations: make(map[uuid.UUID][]string),
+		batchDir:       batchDir,
+	}
 }
-
 
 func NewWorkerNode() *WorkerNode {
 	return &WorkerNode{
-		ID: uuid.New().String(),
-		receivedBatches: make(map[string][]byte),
+		ID:              uuid.New().String(),
+		ReceivedBatches: make(map[string][]byte),
 	}
 }
