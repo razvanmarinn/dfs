@@ -1,9 +1,8 @@
 package batchingprocessor
 
-import "github.com/razvanmarinn/dfs/src/batches"
+import "github.com/razvanmarinn/dfs/internal/batches"
 
-
-const BATCH_SIZE = 1024 * 512
+const BATCH_SIZE = (1024 * 1024) * 62
 
 type BatchProcessor struct {
 	data []byte
@@ -23,7 +22,8 @@ func (bp *BatchProcessor) Process() []batches.Batch {
 		if end > dataLen {
 			end = dataLen
 		}
-		batchData := bp.data[i:end]
+		batchData := make([]byte, end-i)
+		copy(batchData, bp.data[i:end])
 		batch := batches.NewBatch(batchData)
 		_batches = append(_batches, batch)
 	}
