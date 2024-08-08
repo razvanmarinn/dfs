@@ -99,7 +99,7 @@ func main() {
 	server := nodes.NewMasterNode(tempDir)
 	server.Start()
 
-	numWorkers := 3
+	numWorkers := 1
 	basePort := 50051
 	lb := load_balancer.NewLoadBalancer(numWorkers, basePort)
 	defer lb.Close()

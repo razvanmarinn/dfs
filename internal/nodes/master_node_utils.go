@@ -1,13 +1,17 @@
 package nodes
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/google/uuid"
 	batchingprocessor "github.com/razvanmarinn/dfs/internal/batching_processor"
+	"github.com/razvanmarinn/dfs/internal/load_balancer"
+	pb "github.com/razvanmarinn/dfs/proto"
 )
 
 func (mn *MasterNode) GetFiles() map[string][]uuid.UUID {
@@ -92,3 +96,57 @@ func (mn *MasterNode) UpdateBatchLocation(batchUUID uuid.UUID, workerNodeID stri
 	fmt.Printf("Batch %s location updated to %s\n", batchUUID, workerNodeID)
 }
 
+func (m *MasterNode) GetFileBackFromWorkers(filename string, lb *load_balancer.LoadBalancer) ([]byte, error) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
+	batchIDs := m.files[filename]
+	fileData := make([]byte, 0)
+
+	for _, batch := range batchIDs {
+		// Get the worker ID allocated for this batch
+		worker_id, err := m.GetWorkerAllocatedForBatch(batch)
+		if err != nil {
+			return nil, err
+		}
+
+		// Retrieve the client for the corresponding worker ID
+		client := lb.GetClientByWorkerID(worker_id)
+		if client == nil {
+			return nil, fmt.Errorf("no client found for worker ID: %s", worker_id)
+		}
+
+		// Create a request to get the batch data
+		req := &pb.GetBatchRequest{
+			BatchId: &pb.UUID{Value: batch.String()},
+		}
+
+		// Make the request to the worker node
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+		defer cancel()
+
+		resp, err := client.GetBatch(ctx, req)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get batch data from worker %s: %v", worker_id, err)
+		}
+
+		// Append the batch data to the complete file data
+		fileData = append(fileData, resp.BatchData...)
+	}
+
+	return fileData, nil
+}
+
+func (m *MasterNode) GetWorkerAllocatedForBatch(batchID uuid.UUID) (string, error) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
+	workers := m.batchLocations[batchID]
+	if len(workers) == 0 {
+		return "", fmt.Errorf("no workers allocated for batch %s", batchID)
+	}
+
+	workerID := workers[0]
+	return workerID, nil
+
+}

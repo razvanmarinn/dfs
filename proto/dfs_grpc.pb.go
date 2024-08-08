@@ -19,7 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	BatchService_SendBatch_FullMethodName = "/dfs.BatchService/SendBatch"
+	BatchService_SendBatch_FullMethodName   = "/dfs.BatchService/SendBatch"
+	BatchService_GetBatch_FullMethodName    = "/dfs.BatchService/GetBatch"
+	BatchService_GetWorkerID_FullMethodName = "/dfs.BatchService/GetWorkerID"
 )
 
 // BatchServiceClient is the client API for BatchService service.
@@ -27,6 +29,9 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type BatchServiceClient interface {
 	SendBatch(ctx context.Context, in *BatchRequest, opts ...grpc.CallOption) (*BatchResponse, error)
+	GetBatch(ctx context.Context, in *GetBatchRequest, opts ...grpc.CallOption) (*GetBatchResponse, error)
+	// New RPC to retrieve the worker's UUID
+	GetWorkerID(ctx context.Context, in *WorkerIDRequest, opts ...grpc.CallOption) (*WorkerIDResponse, error)
 }
 
 type batchServiceClient struct {
@@ -47,11 +52,34 @@ func (c *batchServiceClient) SendBatch(ctx context.Context, in *BatchRequest, op
 	return out, nil
 }
 
+func (c *batchServiceClient) GetBatch(ctx context.Context, in *GetBatchRequest, opts ...grpc.CallOption) (*GetBatchResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetBatchResponse)
+	err := c.cc.Invoke(ctx, BatchService_GetBatch_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *batchServiceClient) GetWorkerID(ctx context.Context, in *WorkerIDRequest, opts ...grpc.CallOption) (*WorkerIDResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WorkerIDResponse)
+	err := c.cc.Invoke(ctx, BatchService_GetWorkerID_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // BatchServiceServer is the server API for BatchService service.
 // All implementations must embed UnimplementedBatchServiceServer
 // for forward compatibility.
 type BatchServiceServer interface {
 	SendBatch(context.Context, *BatchRequest) (*BatchResponse, error)
+	GetBatch(context.Context, *GetBatchRequest) (*GetBatchResponse, error)
+	// New RPC to retrieve the worker's UUID
+	GetWorkerID(context.Context, *WorkerIDRequest) (*WorkerIDResponse, error)
 	mustEmbedUnimplementedBatchServiceServer()
 }
 
@@ -64,6 +92,12 @@ type UnimplementedBatchServiceServer struct{}
 
 func (UnimplementedBatchServiceServer) SendBatch(context.Context, *BatchRequest) (*BatchResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendBatch not implemented")
+}
+func (UnimplementedBatchServiceServer) GetBatch(context.Context, *GetBatchRequest) (*GetBatchResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetBatch not implemented")
+}
+func (UnimplementedBatchServiceServer) GetWorkerID(context.Context, *WorkerIDRequest) (*WorkerIDResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetWorkerID not implemented")
 }
 func (UnimplementedBatchServiceServer) mustEmbedUnimplementedBatchServiceServer() {}
 func (UnimplementedBatchServiceServer) testEmbeddedByValue()                      {}
@@ -104,6 +138,42 @@ func _BatchService_SendBatch_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BatchService_GetBatch_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBatchRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BatchServiceServer).GetBatch(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BatchService_GetBatch_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BatchServiceServer).GetBatch(ctx, req.(*GetBatchRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BatchService_GetWorkerID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(WorkerIDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BatchServiceServer).GetWorkerID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BatchService_GetWorkerID_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BatchServiceServer).GetWorkerID(ctx, req.(*WorkerIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // BatchService_ServiceDesc is the grpc.ServiceDesc for BatchService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -114,6 +184,14 @@ var BatchService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SendBatch",
 			Handler:    _BatchService_SendBatch_Handler,
+		},
+		{
+			MethodName: "GetBatch",
+			Handler:    _BatchService_GetBatch_Handler,
+		},
+		{
+			MethodName: "GetWorkerID",
+			Handler:    _BatchService_GetWorkerID_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

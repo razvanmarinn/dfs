@@ -44,3 +44,13 @@ func NewWorkerNode() *WorkerNode {
 		ReceivedBatches: make(map[string][]byte),
 	}
 }
+
+func NewWorkerNodeWithState(state *WorkerNodeState) *WorkerNode {
+	if state.ID == "" {
+		return NewWorkerNode()
+	}
+	return &WorkerNode{
+		ID:              state.ID,
+		ReceivedBatches: state.ReceivedBatches,
+	}
+}
