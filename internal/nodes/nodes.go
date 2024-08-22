@@ -17,10 +17,20 @@ type Node interface {
 }
 
 type MasterNode struct {
-	files          map[string][]uuid.UUID
-	batchLocations map[uuid.UUID][]string
-	batchDir       string
+	ID             string
+	FileRegistry   []FileMetadata
 	lock           sync.Mutex
+}
+
+type FileMetadata struct {
+	Name            string         `json:"name"`
+	Size            int64          `json:"size"`
+	Hash            string         `json:"hash"`
+	Batches          []uuid.UUID            `json:"batches"` // list of all the batches for this file in UUID
+	BatchSizes       map[uuid.UUID]int    `json:"batchSizes"`
+	TotalSize       int            `json:"totalSize"`
+	BatchLocations map[uuid.UUID][]uuid.UUID `json:"batchLocations"` // mapping from the uuid of the batches to the UUUID of the 
+	// worker node which it belongs ( it can be stored on multiple worker nodes)
 }
 
 type WorkerNode struct {
@@ -30,11 +40,10 @@ type WorkerNode struct {
 	pb.UnimplementedBatchServiceServer
 }
 
-func NewMasterNode(batchDir string) *MasterNode {
+func NewMasterNode() *MasterNode {
 	return &MasterNode{
-		files:          make(map[string][]uuid.UUID),
-		batchLocations: make(map[uuid.UUID][]string),
-		batchDir:       batchDir,
+		ID:             uuid.New().String(),
+		FileRegistry:   make([]FileMetadata, 0),
 	}
 }
 
@@ -51,6 +60,18 @@ func NewWorkerNodeWithState(state *WorkerNodeState) *WorkerNode {
 	}
 	return &WorkerNode{
 		ID:              state.ID,
-		ReceivedBatches: state.ReceivedBatches,
+		ReceivedBatches: state.getBytesFromPaths(),
+	}
+}
+
+func NewMasterNodeWithState(state *MasterNodeState) *MasterNode {
+
+	if state.ID == "" {
+		return NewMasterNode()
+	}
+
+	return &MasterNode{
+		ID : state.ID,
+		FileRegistry: state.Files,
 	}
 }

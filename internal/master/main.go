@@ -3,9 +3,11 @@ package main
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
+	"os/signal"
+	"sync"
+	"syscall"
 	"time"
 
 	pb "github.com/razvanmarinn/dfs/proto"
@@ -15,7 +17,10 @@ import (
 	"github.com/razvanmarinn/dfs/internal/nodes"
 )
 
-const inputDir = "../../input/"
+const (
+	inputDir  = "input/"
+	stateFile = "master_node_state.json"
+)
 
 func processFiles(server *nodes.MasterNode, lb *load_balancer.LoadBalancer) {
 	entries, err := os.ReadDir(inputDir)
@@ -67,6 +72,7 @@ func processFiles(server *nodes.MasterNode, lb *load_balancer.LoadBalancer) {
 		}
 	}
 }
+
 func sendBatch(client pb.BatchServiceClient, batchID uuid.UUID, batchData []byte) (bool, string) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
@@ -90,13 +96,23 @@ func sendBatch(client pb.BatchServiceClient, batchID uuid.UUID, batchData []byte
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	log.SetOutput(os.Stdout)
-	tempDir, err := ioutil.TempDir("", "batch_data")
-	if err != nil {
-		log.Fatalf("Failed to create temp directory: %v", err)
-	}
-	defer os.RemoveAll(tempDir)
 
-	server := nodes.NewMasterNode(tempDir)
+	state := nodes.NewMasterNodeState()
+
+	if err := state.LoadStateFromFile(); err != nil {
+		log.Fatalf("Failed to load master node state: %v", err)
+	}
+	tempDir := "batch_data"
+	err := os.Mkdir(tempDir, 0755)
+	if err != nil {
+		if !os.IsExist(err) {
+			log.Fatalf("Failed to create temp directory: %v", err)
+		}
+	}
+	// defer os.RemoveAll(tempDir)
+
+	server := nodes.NewMasterNodeWithState(state)
+
 	server.Start()
 
 	numWorkers := 1
@@ -106,13 +122,52 @@ func main() {
 
 	processFiles(server, lb)
 
-	for fileName, batchIDs := range server.GetFiles() {
-		fmt.Printf("File: %s\n", fileName)
-		for _, batchID := range batchIDs {
-			locations := server.GetBatchLocations(batchID)
-			fmt.Printf("  Batch: %s, Locations: %v\n", batchID, locations)
+	for _, file := range server.GetFiles() {
+		fmt.Printf("File: %s\n", file.Name)
+		for _, batch := range file.Batches {
+			locations := server.GetBatchLocations(batch)
+			fmt.Printf("Batch: %s, Locations: %v\n", batch, locations)
 		}
 	}
 
-	select {}
+	// Save state periodically
+	ticker := time.NewTicker(10 * time.Second)
+	defer ticker.Stop()
+
+	go func() {
+		for range ticker.C {
+			if err := state.SaveState(); err != nil {
+				log.Printf("Failed to save master node state: %v", err)
+			}
+		}
+	}()
+
+	// Handle graceful shutdown
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+
+	go func() {
+		defer wg.Done()
+		sig := <-sigs
+		log.Printf("Received signal: %v", sig)
+		log.Println("Shutting down master node...")
+
+		// Save state
+		// update the state of the master node
+
+		state.UpdateState(server)
+		if err := state.SaveState(); err != nil {
+			log.Printf("Failed to save master node state: %v", err)
+		}
+
+		server.Stop()
+		log.Println("Master node stopped")
+	}()
+
+	log.Println("Master node is running. Press Ctrl+C to stop.")
+	wg.Wait()
+	log.Println("Main function exiting")
 }

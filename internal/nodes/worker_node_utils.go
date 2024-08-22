@@ -39,7 +39,7 @@ func (w *WorkerNode) SaveBatch(batchID string) {
 
 	dataToSave := w.ReceivedBatches[batchID]
 
-	filePath := fmt.Sprintf("batches/%s", batchID)
+	filePath := fmt.Sprintf("./internal/worker/batches/%s", batchID)
 
 	f, err := os.Create(filePath + ".bin")
 	if err != nil {
