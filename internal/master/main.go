@@ -4,93 +4,69 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
-	"time"
 
-	pb "github.com/razvanmarinn/dfs/proto"
-
-	"github.com/google/uuid"
-	"github.com/razvanmarinn/dfs/internal/load_balancer"
 	"github.com/razvanmarinn/dfs/internal/nodes"
+	pb "github.com/razvanmarinn/rcss/proto"
+	"google.golang.org/grpc"
 )
 
 const (
-	inputDir  = "input/"
+	port      = ":50052"
 	stateFile = "master_node_state.json"
 )
 
-func processFiles(server *nodes.MasterNode, lb *load_balancer.LoadBalancer) {
-	entries, err := os.ReadDir(inputDir)
-	if err != nil {
-		log.Printf("error reading directory: %v\n", err)
-		return
-	}
-
-	for _, entry := range entries {
-		if entry.IsDir() {
-			continue
-		}
-
-		filePath := inputDir + entry.Name()
-		data, err := os.ReadFile(filePath)
-		if err != nil {
-			log.Printf("error reading file %s: %v\n", filePath, err)
-			continue
-		}
-
-		fileName := entry.Name()
-		log.Printf("Processing file: %s", fileName)
-
-		server.AddFile(fileName, data)
-		batches := server.GetFileBatches(fileName)
-
-		for _, batchID := range batches {
-			batchData, err := server.GetBatchData(batchID)
-			if err != nil {
-				log.Printf("Error reading batch %s: %v", batchID, err)
-				continue
-			}
-
-			log.Printf("Sending batch %s for file %s (size: %d bytes)", batchID, fileName, len(batchData))
-			_, client := lb.GetNextClient()
-
-			success, worker_id := sendBatch(client, batchID, batchData)
-			if success {
-				log.Printf("Successfully sent batch %s for file %s", batchID, fileName)
-				server.UpdateBatchLocation(batchID, worker_id)
-
-				// Clean up the batch file after successful send
-				if err := server.CleanupBatch(batchID); err != nil {
-					log.Printf("Error cleaning up batch %s: %v", batchID, err)
-				}
-			} else {
-				log.Printf("Failed to send batch %s for file %s", batchID, fileName)
-			}
-		}
-	}
+type server struct {
+	pb.UnimplementedMasterServiceServer
+	masterNode *nodes.MasterNode
 }
 
-func sendBatch(client pb.BatchServiceClient, batchID uuid.UUID, batchData []byte) (bool, string) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
+func (s *server) GetBatchDestination(ctx context.Context, in *pb.ClientRequestToMaster) (*pb.MasterResponse, error) {
+	log.Printf("Received GetBatchDestination request for batch: %v", in.GetBatchId())
+	// TODO: Implement logic to determine worker IP and port using MasterNode
+	// This is a placeholder implementation
+	return &pb.MasterResponse{WorkerIp: "worker.example.com", WorkerPort: 8080}, nil
+}
 
-	req := &pb.BatchRequest{
-		BatchId:   &pb.UUID{Value: batchID.String()},
-		BatchData: batchData,
+func (s *server) GetMetadata(ctx context.Context, in *pb.Location) (*pb.MasterMetadataResponse, error) {
+	log.Printf("Received GetMetadata request for file: %v", in.GetFileName())
+
+	uuids := s.masterNode.GetFileBatches(in.GetFileName())
+	batches := make([]string, len(uuids))
+	for i, id := range uuids {
+		batches[i] = id.String()
 	}
 
-	log.Printf("Sending batch request for batch ID: %s", batchID)
-	res, err := client.SendBatch(ctx, req)
-	if err != nil {
-		log.Printf("Error sending batch: %v", err)
-		return false, ""
+
+	batchLocations := make(map[string]*pb.BatchLocation)
+
+	for _, bId := range uuids {
+		worker_node_ids := s.masterNode.GetBatchLocations(bId)
+
+	
+		workerAddresses := make([]string, 0)
+
+		for _, wId := range worker_node_ids {
+			_, address, err := s.masterNode.LoadBalancer.GetClientByWorkerID(wId.String())
+			if err != nil {
+				fmt.Printf("Error getting client for worker ID %s: %v\n", wId.String(), err)
+				continue 
+			}
+			workerAddresses = append(workerAddresses, address)
+		}
+		batchLocations[bId.String()] = &pb.BatchLocation{
+			WorkerIds: workerAddresses,
+		}
 	}
 
-	log.Printf("Batch sent successfully. Worker ID: %s", res.WorkerId.Value)
-	return res.Success, res.WorkerId.Value
+	return &pb.MasterMetadataResponse{
+		Batches:        batches,
+		BatchLocations: batchLocations,
+	}, nil
 }
 
 func main() {
@@ -98,76 +74,54 @@ func main() {
 	log.SetOutput(os.Stdout)
 
 	state := nodes.NewMasterNodeState()
+	masterNode := nodes.GetMasterNodeInstance()
 
-	if err := state.LoadStateFromFile(); err != nil {
-		log.Fatalf("Failed to load master node state: %v", err)
-	}
-	tempDir := "batch_data"
-	err := os.Mkdir(tempDir, 0755)
+	masterNode.InitializeLoadBalancer(1, 50051)
+	defer masterNode.CloseLoadBalancer()
+
+	lis, err := net.Listen("tcp", port)
 	if err != nil {
-		if !os.IsExist(err) {
-			log.Fatalf("Failed to create temp directory: %v", err)
-		}
-	}
-	// defer os.RemoveAll(tempDir)
-
-	server := nodes.NewMasterNodeWithState(state)
-
-	server.Start()
-
-	numWorkers := 1
-	basePort := 50051
-	lb := load_balancer.NewLoadBalancer(numWorkers, basePort)
-	defer lb.Close()
-
-	processFiles(server, lb)
-
-	for _, file := range server.GetFiles() {
-		fmt.Printf("File: %s\n", file.Name)
-		for _, batch := range file.Batches {
-			locations := server.GetBatchLocations(batch)
-			fmt.Printf("Batch: %s, Locations: %v\n", batch, locations)
-		}
+		log.Fatalf("failed to listen: %v", err)
 	}
 
-	// Save state periodically
-	ticker := time.NewTicker(10 * time.Second)
-	defer ticker.Stop()
+	s := grpc.NewServer()
+	pb.RegisterMasterServiceServer(s, &server{
+		masterNode: masterNode,
+	})
 
-	go func() {
-		for range ticker.C {
-			if err := state.SaveState(); err != nil {
-				log.Printf("Failed to save master node state: %v", err)
-			}
-		}
-	}()
-
-	// Handle graceful shutdown
-	sigs := make(chan os.Signal, 1)
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+	log.Printf("gRPC server listening at %v", lis.Addr())
 
 	var wg sync.WaitGroup
 	wg.Add(1)
 
 	go func() {
 		defer wg.Done()
+		if err := s.Serve(lis); err != nil {
+			log.Fatalf("failed to serve: %v", err)
+		}
+	}()
+
+
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
 		sig := <-sigs
 		log.Printf("Received signal: %v", sig)
-		log.Println("Shutting down master node...")
+		log.Println("Shutting down master node and gRPC server...")
 
-		// Save state
-		// update the state of the master node
-
-		state.UpdateState(server)
+		state.UpdateState(masterNode)
 		if err := state.SaveState(); err != nil {
 			log.Printf("Failed to save master node state: %v", err)
 		}
 
-		server.Stop()
-		log.Println("Master node stopped")
+		s.GracefulStop()
+		masterNode.Stop()
+		log.Println("Master node and gRPC server stopped")
+		wg.Done()
 	}()
 
-	log.Println("Master node is running. Press Ctrl+C to stop.")
+	log.Println("Master node and gRPC server are running. Press Ctrl+C to stop.")
 	wg.Wait()
 	log.Println("Main function exiting")
 }

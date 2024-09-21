@@ -4,11 +4,7 @@ package dfs;
 
 option go_package = "github.com/razvanmarinn/dfs/proto/dfs";
 
-service BatchService {
-  rpc SendBatch(BatchRequest) returns (BatchResponse);
-  rpc GetBatch(GetBatchRequest) returns (GetBatchResponse);
-  
-  // New RPC to retrieve the worker's UUID
+service LBService {
   rpc GetWorkerID(WorkerIDRequest) returns (WorkerIDResponse);
 }
 
@@ -16,29 +12,9 @@ message UUID {
    string value = 1;
 }
 
-message BatchRequest {
-  UUID batch_id = 1;
-  bytes batch_data = 2;
-}
-
-message BatchResponse {
-  bool success = 1;
-  UUID worker_id = 2;
-}
-
-message GetBatchRequest {
-  UUID batch_id = 1;
-}
-
-message GetBatchResponse {
-  bytes batch_data = 1;
-}
-
-// New messages for the GetWorkerID RPC
 message WorkerIDRequest {
-  // You can keep this empty or add relevant fields if needed
 }
 
 message WorkerIDResponse {
-  UUID worker_id = 1; // Returns the worker's UUID
+  UUID worker_id = 1;
 }

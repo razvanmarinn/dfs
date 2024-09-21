@@ -15,15 +15,17 @@ import (
 type LoadBalancer struct {
 	clients     map[string]pb.BatchServiceClient // Map from worker UUID to a client
 	batchCounts map[string]int                   // Map from worker UUID to batch count
+	workerInfo  map[string]string                // Map from worker UUID to worker address (IP:Port)
 	mu          sync.Mutex
 }
 
-const MAXIMUM_BATCHES_PER_WORKER = 35
+const MAXIMUM_BATCHES_PER_WORKER = 100
 
 func NewLoadBalancer(numWorkers int, basePort int) *LoadBalancer {
 	lb := &LoadBalancer{
 		clients:     make(map[string]pb.BatchServiceClient),
 		batchCounts: make(map[string]int),
+		workerInfo:  make(map[string]string), // Initialize the workerInfo map
 	}
 
 	for i := 0; i < numWorkers; i++ {
@@ -54,7 +56,10 @@ func NewLoadBalancer(numWorkers int, basePort int) *LoadBalancer {
 
 		workerID := resp.WorkerId.Value
 		lb.clients[workerID] = client
-		lb.batchCounts[workerID] = 0 
+		lb.batchCounts[workerID] = 0
+
+		// Store the worker's address (IP:Port) for future connections
+		lb.workerInfo[workerID] = fmt.Sprintf("localhost:%d", basePort+i)
 
 		log.Printf("Successfully connected to worker node %d with UUID %s", i+1, workerID)
 	}
@@ -105,14 +110,19 @@ func (lb *LoadBalancer) Close() {
 	}
 }
 
-func (lb *LoadBalancer) GetClientByWorkerID(workerID string) pb.BatchServiceClient {
+func (lb *LoadBalancer) GetClientByWorkerID(workerID string) (pb.BatchServiceClient, string, error) {
 	lb.mu.Lock()
 	defer lb.mu.Unlock()
 
 	client, exists := lb.clients[workerID]
 	if !exists {
-		log.Fatalf("No client found for worker ID: %s", workerID)
+		return nil, "", fmt.Errorf("no client found for worker ID: %s", workerID)
 	}
 
-	return client
+	workerAddress, addressExists := lb.workerInfo[workerID]
+	if !addressExists {
+		return nil, "", fmt.Errorf("no address found for worker ID: %s", workerID)
+	}
+
+	return client, workerAddress, nil
 }

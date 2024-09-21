@@ -9,3 +9,8 @@ start-master:
 	@echo "Starting master"
 	cd ./internal/master && go build -o master.exe
 	./internal/master/master.exe
+
+
+start-api:
+	@echo "Starting api"
+	go run internal/api/main.go
