@@ -147,7 +147,7 @@ func (w *WorkerNodeState) SetID(id string) {
 func (w *WorkerNodeState) getBytesFromPaths() map[string][]byte {
 	batches := make(map[string][]byte)
 	for _, batch_id := range w.ReceivedBatches {
-		file_path := fmt.Sprintf("./internal/worker/batches/%s.bin", batch_id)
+		file_path := fmt.Sprintf("./batches/%s.bin", batch_id)
 		data, err := os.ReadFile(file_path)
 		if err != nil {
 			log.Printf("Error reading file %s: %v", file_path, err)

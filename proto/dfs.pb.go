@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.34.2
 // 	protoc        v5.27.3
-// source: proto/dfs.proto
+// source: dfs.proto
 
 package dfs
 
@@ -31,7 +31,7 @@ type UUID struct {
 func (x *UUID) Reset() {
 	*x = UUID{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_dfs_proto_msgTypes[0]
+		mi := &file_dfs_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -44,7 +44,7 @@ func (x *UUID) String() string {
 func (*UUID) ProtoMessage() {}
 
 func (x *UUID) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_dfs_proto_msgTypes[0]
+	mi := &file_dfs_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -57,7 +57,7 @@ func (x *UUID) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UUID.ProtoReflect.Descriptor instead.
 func (*UUID) Descriptor() ([]byte, []int) {
-	return file_proto_dfs_proto_rawDescGZIP(), []int{0}
+	return file_dfs_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *UUID) GetValue() string {
@@ -67,211 +67,6 @@ func (x *UUID) GetValue() string {
 	return ""
 }
 
-type BatchRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	BatchId   *UUID  `protobuf:"bytes,1,opt,name=batch_id,json=batchId,proto3" json:"batch_id,omitempty"`
-	BatchData []byte `protobuf:"bytes,2,opt,name=batch_data,json=batchData,proto3" json:"batch_data,omitempty"`
-}
-
-func (x *BatchRequest) Reset() {
-	*x = BatchRequest{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_dfs_proto_msgTypes[1]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *BatchRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*BatchRequest) ProtoMessage() {}
-
-func (x *BatchRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_dfs_proto_msgTypes[1]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use BatchRequest.ProtoReflect.Descriptor instead.
-func (*BatchRequest) Descriptor() ([]byte, []int) {
-	return file_proto_dfs_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *BatchRequest) GetBatchId() *UUID {
-	if x != nil {
-		return x.BatchId
-	}
-	return nil
-}
-
-func (x *BatchRequest) GetBatchData() []byte {
-	if x != nil {
-		return x.BatchData
-	}
-	return nil
-}
-
-type BatchResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Success  bool  `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
-	WorkerId *UUID `protobuf:"bytes,2,opt,name=worker_id,json=workerId,proto3" json:"worker_id,omitempty"`
-}
-
-func (x *BatchResponse) Reset() {
-	*x = BatchResponse{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_dfs_proto_msgTypes[2]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *BatchResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*BatchResponse) ProtoMessage() {}
-
-func (x *BatchResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_dfs_proto_msgTypes[2]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use BatchResponse.ProtoReflect.Descriptor instead.
-func (*BatchResponse) Descriptor() ([]byte, []int) {
-	return file_proto_dfs_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *BatchResponse) GetSuccess() bool {
-	if x != nil {
-		return x.Success
-	}
-	return false
-}
-
-func (x *BatchResponse) GetWorkerId() *UUID {
-	if x != nil {
-		return x.WorkerId
-	}
-	return nil
-}
-
-type GetBatchRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	BatchId *UUID `protobuf:"bytes,1,opt,name=batch_id,json=batchId,proto3" json:"batch_id,omitempty"`
-}
-
-func (x *GetBatchRequest) Reset() {
-	*x = GetBatchRequest{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_dfs_proto_msgTypes[3]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *GetBatchRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetBatchRequest) ProtoMessage() {}
-
-func (x *GetBatchRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_dfs_proto_msgTypes[3]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetBatchRequest.ProtoReflect.Descriptor instead.
-func (*GetBatchRequest) Descriptor() ([]byte, []int) {
-	return file_proto_dfs_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *GetBatchRequest) GetBatchId() *UUID {
-	if x != nil {
-		return x.BatchId
-	}
-	return nil
-}
-
-type GetBatchResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	BatchData []byte `protobuf:"bytes,1,opt,name=batch_data,json=batchData,proto3" json:"batch_data,omitempty"`
-}
-
-func (x *GetBatchResponse) Reset() {
-	*x = GetBatchResponse{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_dfs_proto_msgTypes[4]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *GetBatchResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetBatchResponse) ProtoMessage() {}
-
-func (x *GetBatchResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_dfs_proto_msgTypes[4]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetBatchResponse.ProtoReflect.Descriptor instead.
-func (*GetBatchResponse) Descriptor() ([]byte, []int) {
-	return file_proto_dfs_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *GetBatchResponse) GetBatchData() []byte {
-	if x != nil {
-		return x.BatchData
-	}
-	return nil
-}
-
-// New messages for the GetWorkerID RPC
 type WorkerIDRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -281,7 +76,7 @@ type WorkerIDRequest struct {
 func (x *WorkerIDRequest) Reset() {
 	*x = WorkerIDRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_dfs_proto_msgTypes[5]
+		mi := &file_dfs_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -294,7 +89,7 @@ func (x *WorkerIDRequest) String() string {
 func (*WorkerIDRequest) ProtoMessage() {}
 
 func (x *WorkerIDRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_dfs_proto_msgTypes[5]
+	mi := &file_dfs_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -307,7 +102,7 @@ func (x *WorkerIDRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WorkerIDRequest.ProtoReflect.Descriptor instead.
 func (*WorkerIDRequest) Descriptor() ([]byte, []int) {
-	return file_proto_dfs_proto_rawDescGZIP(), []int{5}
+	return file_dfs_proto_rawDescGZIP(), []int{1}
 }
 
 type WorkerIDResponse struct {
@@ -315,13 +110,13 @@ type WorkerIDResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	WorkerId *UUID `protobuf:"bytes,1,opt,name=worker_id,json=workerId,proto3" json:"worker_id,omitempty"` // Returns the worker's UUID
+	WorkerId *UUID `protobuf:"bytes,1,opt,name=worker_id,json=workerId,proto3" json:"worker_id,omitempty"`
 }
 
 func (x *WorkerIDResponse) Reset() {
 	*x = WorkerIDResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_dfs_proto_msgTypes[6]
+		mi := &file_dfs_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -334,7 +129,7 @@ func (x *WorkerIDResponse) String() string {
 func (*WorkerIDResponse) ProtoMessage() {}
 
 func (x *WorkerIDResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_dfs_proto_msgTypes[6]
+	mi := &file_dfs_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -347,7 +142,7 @@ func (x *WorkerIDResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WorkerIDResponse.ProtoReflect.Descriptor instead.
 func (*WorkerIDResponse) Descriptor() ([]byte, []int) {
-	return file_proto_dfs_proto_rawDescGZIP(), []int{6}
+	return file_dfs_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *WorkerIDResponse) GetWorkerId() *UUID {
@@ -357,99 +152,63 @@ func (x *WorkerIDResponse) GetWorkerId() *UUID {
 	return nil
 }
 
-var File_proto_dfs_proto protoreflect.FileDescriptor
+var File_dfs_proto protoreflect.FileDescriptor
 
-var file_proto_dfs_proto_rawDesc = []byte{
-	0x0a, 0x0f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x64, 0x66, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x12, 0x03, 0x64, 0x66, 0x73, 0x22, 0x1c, 0x0a, 0x04, 0x55, 0x55, 0x49, 0x44, 0x12, 0x14,
-	0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76,
-	0x61, 0x6c, 0x75, 0x65, 0x22, 0x53, 0x0a, 0x0c, 0x42, 0x61, 0x74, 0x63, 0x68, 0x52, 0x65, 0x71,
-	0x75, 0x65, 0x73, 0x74, 0x12, 0x24, 0x0a, 0x08, 0x62, 0x61, 0x74, 0x63, 0x68, 0x5f, 0x69, 0x64,
-	0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x09, 0x2e, 0x64, 0x66, 0x73, 0x2e, 0x55, 0x55, 0x49,
-	0x44, 0x52, 0x07, 0x62, 0x61, 0x74, 0x63, 0x68, 0x49, 0x64, 0x12, 0x1d, 0x0a, 0x0a, 0x62, 0x61,
-	0x74, 0x63, 0x68, 0x5f, 0x64, 0x61, 0x74, 0x61, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x09,
-	0x62, 0x61, 0x74, 0x63, 0x68, 0x44, 0x61, 0x74, 0x61, 0x22, 0x51, 0x0a, 0x0d, 0x42, 0x61, 0x74,
-	0x63, 0x68, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x73, 0x75,
-	0x63, 0x63, 0x65, 0x73, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x07, 0x73, 0x75, 0x63,
-	0x63, 0x65, 0x73, 0x73, 0x12, 0x26, 0x0a, 0x09, 0x77, 0x6f, 0x72, 0x6b, 0x65, 0x72, 0x5f, 0x69,
-	0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x09, 0x2e, 0x64, 0x66, 0x73, 0x2e, 0x55, 0x55,
-	0x49, 0x44, 0x52, 0x08, 0x77, 0x6f, 0x72, 0x6b, 0x65, 0x72, 0x49, 0x64, 0x22, 0x37, 0x0a, 0x0f,
-	0x47, 0x65, 0x74, 0x42, 0x61, 0x74, 0x63, 0x68, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12,
-	0x24, 0x0a, 0x08, 0x62, 0x61, 0x74, 0x63, 0x68, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28,
-	0x0b, 0x32, 0x09, 0x2e, 0x64, 0x66, 0x73, 0x2e, 0x55, 0x55, 0x49, 0x44, 0x52, 0x07, 0x62, 0x61,
-	0x74, 0x63, 0x68, 0x49, 0x64, 0x22, 0x31, 0x0a, 0x10, 0x47, 0x65, 0x74, 0x42, 0x61, 0x74, 0x63,
-	0x68, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x1d, 0x0a, 0x0a, 0x62, 0x61, 0x74,
-	0x63, 0x68, 0x5f, 0x64, 0x61, 0x74, 0x61, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x09, 0x62,
-	0x61, 0x74, 0x63, 0x68, 0x44, 0x61, 0x74, 0x61, 0x22, 0x11, 0x0a, 0x0f, 0x57, 0x6f, 0x72, 0x6b,
-	0x65, 0x72, 0x49, 0x44, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x3a, 0x0a, 0x10, 0x57,
-	0x6f, 0x72, 0x6b, 0x65, 0x72, 0x49, 0x44, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
-	0x26, 0x0a, 0x09, 0x77, 0x6f, 0x72, 0x6b, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01,
-	0x28, 0x0b, 0x32, 0x09, 0x2e, 0x64, 0x66, 0x73, 0x2e, 0x55, 0x55, 0x49, 0x44, 0x52, 0x08, 0x77,
-	0x6f, 0x72, 0x6b, 0x65, 0x72, 0x49, 0x64, 0x32, 0xb7, 0x01, 0x0a, 0x0c, 0x42, 0x61, 0x74, 0x63,
-	0x68, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x32, 0x0a, 0x09, 0x53, 0x65, 0x6e, 0x64,
-	0x42, 0x61, 0x74, 0x63, 0x68, 0x12, 0x11, 0x2e, 0x64, 0x66, 0x73, 0x2e, 0x42, 0x61, 0x74, 0x63,
-	0x68, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x12, 0x2e, 0x64, 0x66, 0x73, 0x2e, 0x42,
-	0x61, 0x74, 0x63, 0x68, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x37, 0x0a, 0x08,
-	0x47, 0x65, 0x74, 0x42, 0x61, 0x74, 0x63, 0x68, 0x12, 0x14, 0x2e, 0x64, 0x66, 0x73, 0x2e, 0x47,
-	0x65, 0x74, 0x42, 0x61, 0x74, 0x63, 0x68, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x15,
-	0x2e, 0x64, 0x66, 0x73, 0x2e, 0x47, 0x65, 0x74, 0x42, 0x61, 0x74, 0x63, 0x68, 0x52, 0x65, 0x73,
-	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x3a, 0x0a, 0x0b, 0x47, 0x65, 0x74, 0x57, 0x6f, 0x72, 0x6b,
-	0x65, 0x72, 0x49, 0x44, 0x12, 0x14, 0x2e, 0x64, 0x66, 0x73, 0x2e, 0x57, 0x6f, 0x72, 0x6b, 0x65,
-	0x72, 0x49, 0x44, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x15, 0x2e, 0x64, 0x66, 0x73,
-	0x2e, 0x57, 0x6f, 0x72, 0x6b, 0x65, 0x72, 0x49, 0x44, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x42, 0x27, 0x5a, 0x25, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f,
-	0x72, 0x61, 0x7a, 0x76, 0x61, 0x6e, 0x6d, 0x61, 0x72, 0x69, 0x6e, 0x6e, 0x2f, 0x64, 0x66, 0x73,
-	0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x64, 0x66, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x33,
+var file_dfs_proto_rawDesc = []byte{
+	0x0a, 0x09, 0x64, 0x66, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x03, 0x64, 0x66, 0x73,
+	0x22, 0x1c, 0x0a, 0x04, 0x55, 0x55, 0x49, 0x44, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75,
+	0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x22, 0x11,
+	0x0a, 0x0f, 0x57, 0x6f, 0x72, 0x6b, 0x65, 0x72, 0x49, 0x44, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x22, 0x3a, 0x0a, 0x10, 0x57, 0x6f, 0x72, 0x6b, 0x65, 0x72, 0x49, 0x44, 0x52, 0x65, 0x73,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x26, 0x0a, 0x09, 0x77, 0x6f, 0x72, 0x6b, 0x65, 0x72, 0x5f,
+	0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x09, 0x2e, 0x64, 0x66, 0x73, 0x2e, 0x55,
+	0x55, 0x49, 0x44, 0x52, 0x08, 0x77, 0x6f, 0x72, 0x6b, 0x65, 0x72, 0x49, 0x64, 0x32, 0x47, 0x0a,
+	0x09, 0x4c, 0x42, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x3a, 0x0a, 0x0b, 0x47, 0x65,
+	0x74, 0x57, 0x6f, 0x72, 0x6b, 0x65, 0x72, 0x49, 0x44, 0x12, 0x14, 0x2e, 0x64, 0x66, 0x73, 0x2e,
+	0x57, 0x6f, 0x72, 0x6b, 0x65, 0x72, 0x49, 0x44, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a,
+	0x15, 0x2e, 0x64, 0x66, 0x73, 0x2e, 0x57, 0x6f, 0x72, 0x6b, 0x65, 0x72, 0x49, 0x44, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0x27, 0x5a, 0x25, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62,
+	0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x72, 0x61, 0x7a, 0x76, 0x61, 0x6e, 0x6d, 0x61, 0x72, 0x69, 0x6e,
+	0x6e, 0x2f, 0x64, 0x66, 0x73, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x64, 0x66, 0x73, 0x62,
+	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
-	file_proto_dfs_proto_rawDescOnce sync.Once
-	file_proto_dfs_proto_rawDescData = file_proto_dfs_proto_rawDesc
+	file_dfs_proto_rawDescOnce sync.Once
+	file_dfs_proto_rawDescData = file_dfs_proto_rawDesc
 )
 
-func file_proto_dfs_proto_rawDescGZIP() []byte {
-	file_proto_dfs_proto_rawDescOnce.Do(func() {
-		file_proto_dfs_proto_rawDescData = protoimpl.X.CompressGZIP(file_proto_dfs_proto_rawDescData)
+func file_dfs_proto_rawDescGZIP() []byte {
+	file_dfs_proto_rawDescOnce.Do(func() {
+		file_dfs_proto_rawDescData = protoimpl.X.CompressGZIP(file_dfs_proto_rawDescData)
 	})
-	return file_proto_dfs_proto_rawDescData
+	return file_dfs_proto_rawDescData
 }
 
-var file_proto_dfs_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
-var file_proto_dfs_proto_goTypes = []any{
+var file_dfs_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_dfs_proto_goTypes = []any{
 	(*UUID)(nil),             // 0: dfs.UUID
-	(*BatchRequest)(nil),     // 1: dfs.BatchRequest
-	(*BatchResponse)(nil),    // 2: dfs.BatchResponse
-	(*GetBatchRequest)(nil),  // 3: dfs.GetBatchRequest
-	(*GetBatchResponse)(nil), // 4: dfs.GetBatchResponse
-	(*WorkerIDRequest)(nil),  // 5: dfs.WorkerIDRequest
-	(*WorkerIDResponse)(nil), // 6: dfs.WorkerIDResponse
+	(*WorkerIDRequest)(nil),  // 1: dfs.WorkerIDRequest
+	(*WorkerIDResponse)(nil), // 2: dfs.WorkerIDResponse
 }
-var file_proto_dfs_proto_depIdxs = []int32{
-	0, // 0: dfs.BatchRequest.batch_id:type_name -> dfs.UUID
-	0, // 1: dfs.BatchResponse.worker_id:type_name -> dfs.UUID
-	0, // 2: dfs.GetBatchRequest.batch_id:type_name -> dfs.UUID
-	0, // 3: dfs.WorkerIDResponse.worker_id:type_name -> dfs.UUID
-	1, // 4: dfs.BatchService.SendBatch:input_type -> dfs.BatchRequest
-	3, // 5: dfs.BatchService.GetBatch:input_type -> dfs.GetBatchRequest
-	5, // 6: dfs.BatchService.GetWorkerID:input_type -> dfs.WorkerIDRequest
-	2, // 7: dfs.BatchService.SendBatch:output_type -> dfs.BatchResponse
-	4, // 8: dfs.BatchService.GetBatch:output_type -> dfs.GetBatchResponse
-	6, // 9: dfs.BatchService.GetWorkerID:output_type -> dfs.WorkerIDResponse
-	7, // [7:10] is the sub-list for method output_type
-	4, // [4:7] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+var file_dfs_proto_depIdxs = []int32{
+	0, // 0: dfs.WorkerIDResponse.worker_id:type_name -> dfs.UUID
+	1, // 1: dfs.LBService.GetWorkerID:input_type -> dfs.WorkerIDRequest
+	2, // 2: dfs.LBService.GetWorkerID:output_type -> dfs.WorkerIDResponse
+	2, // [2:3] is the sub-list for method output_type
+	1, // [1:2] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
-func init() { file_proto_dfs_proto_init() }
-func file_proto_dfs_proto_init() {
-	if File_proto_dfs_proto != nil {
+func init() { file_dfs_proto_init() }
+func file_dfs_proto_init() {
+	if File_dfs_proto != nil {
 		return
 	}
 	if !protoimpl.UnsafeEnabled {
-		file_proto_dfs_proto_msgTypes[0].Exporter = func(v any, i int) any {
+		file_dfs_proto_msgTypes[0].Exporter = func(v any, i int) any {
 			switch v := v.(*UUID); i {
 			case 0:
 				return &v.state
@@ -461,55 +220,7 @@ func file_proto_dfs_proto_init() {
 				return nil
 			}
 		}
-		file_proto_dfs_proto_msgTypes[1].Exporter = func(v any, i int) any {
-			switch v := v.(*BatchRequest); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_proto_dfs_proto_msgTypes[2].Exporter = func(v any, i int) any {
-			switch v := v.(*BatchResponse); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_proto_dfs_proto_msgTypes[3].Exporter = func(v any, i int) any {
-			switch v := v.(*GetBatchRequest); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_proto_dfs_proto_msgTypes[4].Exporter = func(v any, i int) any {
-			switch v := v.(*GetBatchResponse); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_proto_dfs_proto_msgTypes[5].Exporter = func(v any, i int) any {
+		file_dfs_proto_msgTypes[1].Exporter = func(v any, i int) any {
 			switch v := v.(*WorkerIDRequest); i {
 			case 0:
 				return &v.state
@@ -521,7 +232,7 @@ func file_proto_dfs_proto_init() {
 				return nil
 			}
 		}
-		file_proto_dfs_proto_msgTypes[6].Exporter = func(v any, i int) any {
+		file_dfs_proto_msgTypes[2].Exporter = func(v any, i int) any {
 			switch v := v.(*WorkerIDResponse); i {
 			case 0:
 				return &v.state
@@ -538,18 +249,18 @@ func file_proto_dfs_proto_init() {
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: file_proto_dfs_proto_rawDesc,
+			RawDescriptor: file_dfs_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_proto_dfs_proto_goTypes,
-		DependencyIndexes: file_proto_dfs_proto_depIdxs,
-		MessageInfos:      file_proto_dfs_proto_msgTypes,
+		GoTypes:           file_dfs_proto_goTypes,
+		DependencyIndexes: file_dfs_proto_depIdxs,
+		MessageInfos:      file_dfs_proto_msgTypes,
 	}.Build()
-	File_proto_dfs_proto = out.File
-	file_proto_dfs_proto_rawDesc = nil
-	file_proto_dfs_proto_goTypes = nil
-	file_proto_dfs_proto_depIdxs = nil
+	File_dfs_proto = out.File
+	file_dfs_proto_rawDesc = nil
+	file_dfs_proto_goTypes = nil
+	file_dfs_proto_depIdxs = nil
 }

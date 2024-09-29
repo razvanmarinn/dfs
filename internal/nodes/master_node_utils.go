@@ -3,6 +3,8 @@ package nodes
 import (
 	"fmt"
 
+	pb "github.com/razvanmarinn/rcss/proto"
+
 	"github.com/google/uuid"
 	"github.com/razvanmarinn/dfs/internal/load_balancer"
 )
@@ -90,4 +92,26 @@ func (mn *MasterNode) CloseLoadBalancer() {
 	if mn.LoadBalancer != nil {
 		mn.LoadBalancer.Close()
 	}
+}
+
+func (mn *MasterNode) RegisterFile(in *pb.ClientFileRequestToMaster) *FileMetadata {
+	fMetadata := &FileMetadata{
+		Name:          in.GetFileName(),
+		Size:          0,
+		Hash:          uint32(in.GetHash()),
+		Batches:       make([]uuid.UUID, len(in.Batches)),
+		BatchSizes:    make(map[uuid.UUID]int),
+		TotalSize:     0,
+		BatchLocations: make(map[uuid.UUID][]uuid.UUID),
+	}
+
+	for i, batch := range in.Batches {
+		uuid, err := uuid.Parse(batch)
+		if err != nil {
+			fmt.Printf("asdasdads")
+		}
+		fMetadata.Batches[i] = uuid
+	}
+
+	return fMetadata
 }

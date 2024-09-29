@@ -12,24 +12,36 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
+type WorkerMetadata struct {
+	Client     pb.LBServiceClient
+	Ip         string
+	Port       int32
+	BatchCount int
+}
+
+func NewWorkerMetadata(client pb.LBServiceClient, ip string, port int32, bc int) *WorkerMetadata {
+	return &WorkerMetadata{
+		Client:     client,
+		Ip:         ip,
+		Port:       port,
+		BatchCount: bc,
+	}
+}
+
 type LoadBalancer struct {
-	clients     map[string]pb.BatchServiceClient // Map from worker UUID to a client
-	batchCounts map[string]int                   // Map from worker UUID to batch count
-	workerInfo  map[string]string                // Map from worker UUID to worker address (IP:Port)
-	mu          sync.Mutex
+	workerInfo map[string]WorkerMetadata
+	currentIdx int
+	mu         sync.Mutex
 }
 
 const MAXIMUM_BATCHES_PER_WORKER = 100
 
 func NewLoadBalancer(numWorkers int, basePort int) *LoadBalancer {
 	lb := &LoadBalancer{
-		clients:     make(map[string]pb.BatchServiceClient),
-		batchCounts: make(map[string]int),
-		workerInfo:  make(map[string]string), // Initialize the workerInfo map
+		workerInfo: make(map[string]WorkerMetadata), // Initialize the workerInfo map
 	}
 
 	for i := 0; i < numWorkers; i++ {
-		// Dial the worker at the specified port
 		conn, err := grpc.Dial(
 			fmt.Sprintf("localhost:%d", basePort+i),
 			grpc.WithTransportCredentials(insecure.NewCredentials()),
@@ -42,7 +54,7 @@ func NewLoadBalancer(numWorkers int, basePort int) *LoadBalancer {
 			log.Fatalf("did not connect to worker %d: %v", i+1, err)
 		}
 
-		client := pb.NewBatchServiceClient(conn)
+		client := pb.NewLBServiceClient(conn)
 
 		// Make an initial request to get the worker ID
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
@@ -55,74 +67,49 @@ func NewLoadBalancer(numWorkers int, basePort int) *LoadBalancer {
 		}
 
 		workerID := resp.WorkerId.Value
-		lb.clients[workerID] = client
-		lb.batchCounts[workerID] = 0
-
-		// Store the worker's address (IP:Port) for future connections
-		lb.workerInfo[workerID] = fmt.Sprintf("localhost:%d", basePort+i)
-
+		wMetadata := NewWorkerMetadata(client, "localhost", int32(basePort+i), 0)
+		lb.workerInfo[workerID] = *wMetadata
 		log.Printf("Successfully connected to worker node %d with UUID %s", i+1, workerID)
 	}
 
 	return lb
 }
 
-func (lb *LoadBalancer) GetNextClient() (string, pb.BatchServiceClient) {
-	lb.mu.Lock()
-	defer lb.mu.Unlock()
-
-	var selectedWorkerID string
-	var selectedClient pb.BatchServiceClient
-
-	// Simple round-robin or load-based selection strategy
-	for workerID, client := range lb.clients {
-		if lb.batchCounts[workerID] < MAXIMUM_BATCHES_PER_WORKER {
-			selectedWorkerID = workerID
-			selectedClient = client
-			lb.batchCounts[workerID]++
-			fmt.Printf("Batch added to Worker %s (Batch count: %d)\n", workerID, lb.batchCounts[workerID])
-			break
-		}
-	}
-
-	// Optionally, update currentNode for round-robin selection if needed
-
-	return selectedWorkerID, selectedClient
+func (lb *LoadBalancer) GetNextClient() (string, WorkerMetadata) {
+	wId, wm := lb.Rotate()
+	return wId, wm
 }
 
-func (lb *LoadBalancer) PrintStatus() {
+func (lb *LoadBalancer) Rotate() (string, WorkerMetadata) {
 	lb.mu.Lock()
 	defer lb.mu.Unlock()
 
-	fmt.Println("Load Balancer Status:")
-	for workerID, count := range lb.batchCounts {
-		fmt.Printf("Worker %s: %d batches\n", workerID, count)
+	keys := make([]string, 0, len(lb.workerInfo))
+	for key := range lb.workerInfo {
+		keys = append(keys, key)
 	}
-	fmt.Println()
+
+	lb.currentIdx = (lb.currentIdx + 1) % len(keys)
+
+	clientKey := keys[lb.currentIdx]
+	wMetadata := lb.workerInfo[clientKey]
+
+	return clientKey, wMetadata
 }
 
 func (lb *LoadBalancer) Close() {
-	for _, client := range lb.clients {
-		if conn, ok := client.(grpc.ClientConnInterface); ok {
+	for _, wm := range lb.workerInfo {
+		if conn, ok := wm.Client.(grpc.ClientConnInterface); ok {
 			// conn.Close()
 			fmt.Println("Connection closed", conn)
 		}
 	}
 }
 
-func (lb *LoadBalancer) GetClientByWorkerID(workerID string) (pb.BatchServiceClient, string, error) {
+func (lb *LoadBalancer) GetClientByWorkerID(workerID string) (pb.LBServiceClient, string, int32, error) {
 	lb.mu.Lock()
 	defer lb.mu.Unlock()
 
-	client, exists := lb.clients[workerID]
-	if !exists {
-		return nil, "", fmt.Errorf("no client found for worker ID: %s", workerID)
-	}
-
-	workerAddress, addressExists := lb.workerInfo[workerID]
-	if !addressExists {
-		return nil, "", fmt.Errorf("no address found for worker ID: %s", workerID)
-	}
-
-	return client, workerAddress, nil
+	wm := lb.workerInfo[workerID]
+	return wm.Client, wm.Ip, wm.Port, nil
 }

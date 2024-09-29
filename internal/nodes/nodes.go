@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/razvanmarinn/dfs/internal/load_balancer"
 	pb "github.com/razvanmarinn/dfs/proto"
+	master_pb "github.com/razvanmarinn/rcss/proto"
 )
 
 const fileBatchesTopic = "file-batches"
@@ -44,7 +45,8 @@ type WorkerNode struct {
 	ID              string
 	lock            sync.Mutex
 	ReceivedBatches map[string][]byte
-	pb.UnimplementedBatchServiceServer
+	pb.UnimplementedLBServiceServer
+	master_pb.UnimplementedWorkerServiceServer
 }
 
 func NewMasterNode() *MasterNode {

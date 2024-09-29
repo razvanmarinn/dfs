@@ -7,7 +7,8 @@ import (
 	"log"
 	"os"
 
-	pb "github.com/razvanmarinn/dfs/proto" // Adjust the import path as necessary
+	pb "github.com/razvanmarinn/dfs/proto"
+	master_pb "github.com/razvanmarinn/rcss/proto"
 )
 
 func (wn *WorkerNode) Start() {
@@ -21,15 +22,14 @@ func (wn *WorkerNode) HealthCheck() bool {
 	return true
 }
 
-func (w *WorkerNode) SendBatch(ctx context.Context, req *pb.BatchRequest) (*pb.BatchResponse, error) {
-	batchID := req.BatchId.Value
-	w.ReceivedBatches[batchID] = req.BatchData
+func (w *WorkerNode) SendBatch(ctx context.Context, req *master_pb.ClientRequestToWorker) (*master_pb.WorkerResponse, error) {
+	batchID := req.BatchId
+	w.ReceivedBatches[batchID] = req.Data
 	w.SaveBatch(batchID)
-	log.Printf("Received and stored batch ID: %s, Data length: %d", batchID, len(req.BatchData))
+	log.Printf("Received and stored batch ID: %s, Data length: %d", batchID, len(req.Data))
 
-	return &pb.BatchResponse{
-		Success:  true,
-		WorkerId: &pb.UUID{Value: w.ID},
+	return &master_pb.WorkerResponse{
+		Success: true,
 	}, nil
 }
 
@@ -59,12 +59,11 @@ func (w *WorkerNode) GetWorkerID(ctx context.Context, req *pb.WorkerIDRequest) (
 	}, nil
 }
 
-
-func (wn *WorkerNode) GetBatch(ctx context.Context, req *pb.GetBatchRequest) (*pb.GetBatchResponse, error) {
-	batchID := req.BatchId.Value
+func (wn *WorkerNode) GetBatch(ctx context.Context, req *master_pb.Ttt) (*master_pb.WorkerBatchResponse, error) {
+	batchID := req.BatchID
 	batchData := wn.ReceivedBatches[batchID]
 
-	return &pb.GetBatchResponse{
+	return &master_pb.WorkerBatchResponse{
 		BatchData: batchData,
 	}, nil
 }
