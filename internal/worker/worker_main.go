@@ -29,7 +29,7 @@ func main() {
 	}
 
 	// Set up the gRPC server
-	address := ":50052"
+	address := ":50051"
 	lis, err := net.Listen("tcp", address)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)

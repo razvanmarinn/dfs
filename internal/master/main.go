@@ -29,7 +29,6 @@ type server struct {
 func (s *server) RegisterFile(ctx context.Context, in *pb.ClientFileRequestToMaster) (*pb.MasterFileResponse, error) {
 	fm := s.masterNode.RegisterFile(in)
 
-
 	s.masterNode.FileRegistry = append(s.masterNode.FileRegistry, *fm)
 	return &pb.MasterFileResponse{Success: true}, nil
 }
@@ -94,7 +93,7 @@ func main() {
 	state := nodes.NewMasterNodeState()
 	masterNode := nodes.GetMasterNodeInstance()
 
-	masterNode.InitializeLoadBalancer(2, 50051)
+	masterNode.InitializeLoadBalancer(1, 50051)
 	defer masterNode.CloseLoadBalancer()
 
 	lis, err := net.Listen("tcp", port)
