@@ -97,23 +97,23 @@ func (mn *MasterNode) CloseLoadBalancer() {
 func (mn *MasterNode) RegisterFile(in *pb.ClientFileRequestToMaster) *FileMetadata {
     fMetadata := &FileMetadata{
         Name:          in.GetFileName(),
-        Size:          0,
+        Size:          in.GetFileSize(),
         Hash:          uint32(in.GetHash()),
-        Batches:       make([]uuid.UUID, len(in.Batches)),
+        Batches:       make([]uuid.UUID, len(in.BatchInfo.Batches)),
         BatchSizes:    make(map[uuid.UUID]int),
-        TotalSize:     0,
         BatchLocations: make(map[uuid.UUID][]uuid.UUID),
     }
 
-    for i, batch := range in.Batches {
+    for i, batch := range in.BatchInfo.Batches {
 
-        batchUUID, err := uuid.Parse(batch)
+        batchUUID, err := uuid.Parse(batch.Uuid)
         if err != nil {
             fmt.Printf("Error parsing batch UUID: %v\n", err)
             continue 
         }
 
         fMetadata.Batches[i] = batchUUID
+		fMetadata.BatchSizes[batchUUID] = int(batch.Size)
 
 
         fMetadata.BatchLocations[batchUUID] = make([]uuid.UUID, 0)

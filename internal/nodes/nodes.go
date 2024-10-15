@@ -36,7 +36,6 @@ type FileMetadata struct {
 	Hash           uint32                    `json:"hash"`
 	Batches        []uuid.UUID               `json:"batches"` // list of all the batches for this file in UUID
 	BatchSizes     map[uuid.UUID]int         `json:"batchSizes"`
-	TotalSize      int                       `json:"totalSize"`
 	BatchLocations map[uuid.UUID][]uuid.UUID `json:"batchLocations"` // mapping from the uuid of the batches to the UUUID of the
 	// worker node which it belongs ( it can be stored on multiple worker nodes)
 }

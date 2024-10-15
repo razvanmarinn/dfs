@@ -43,7 +43,7 @@ func NewLoadBalancer(numWorkers int, basePort int) *LoadBalancer {
 
 	for i := 0; i < numWorkers; i++ {
 		conn, err := grpc.Dial(
-			fmt.Sprintf("localhost:%d", basePort+i),
+			fmt.Sprintf("host.docker.internal:%d", basePort+i),
 			grpc.WithTransportCredentials(insecure.NewCredentials()),
 			grpc.WithDefaultCallOptions(
 				grpc.MaxCallRecvMsgSize(64*1024*1024),
