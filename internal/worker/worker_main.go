@@ -29,7 +29,10 @@ func main() {
 	}
 
 	// Set up the gRPC server
-	address := ":50051"
+	address := os.Getenv("GRPC_PORT")
+    if address == "" {
+        address = ":50051" // Default to 50051 if the environment variable is not set
+    }
 	lis, err := net.Listen("tcp", address)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)

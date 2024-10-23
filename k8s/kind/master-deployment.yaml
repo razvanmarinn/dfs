@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: master
-        image: dfs-master:v1.0  # Replace with your built image
+        image: dfs-master:v1.3  
         ports:
         - containerPort: 50055
 ---
@@ -23,7 +23,7 @@ kind: Service
 metadata:
   name: master
 spec:
-  type: LoadBalancer  # Change to LoadBalancer
+  type: ClusterIP
   ports:
     - port: 50055
       targetPort: 50055

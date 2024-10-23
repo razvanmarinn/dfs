@@ -93,7 +93,7 @@ func main() {
 	state := nodes.NewMasterNodeState()
 	masterNode := nodes.GetMasterNodeInstance()
 
-	masterNode.InitializeLoadBalancer(1, 50051)
+	masterNode.InitializeLoadBalancer(3, 50051)
 	defer masterNode.CloseLoadBalancer()
 
 	lis, err := net.Listen("tcp", port)

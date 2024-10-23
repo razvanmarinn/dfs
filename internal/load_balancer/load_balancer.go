@@ -43,7 +43,7 @@ func NewLoadBalancer(numWorkers int, basePort int) *LoadBalancer {
 
 	for i := 0; i < numWorkers; i++ {
 		conn, err := grpc.Dial(
-			fmt.Sprintf("host.docker.internal:%d", basePort+i),
+			fmt.Sprintf("worker-%d:%d", i+1, basePort+i),
 			grpc.WithTransportCredentials(insecure.NewCredentials()),
 			grpc.WithDefaultCallOptions(
 				grpc.MaxCallRecvMsgSize(64*1024*1024),
@@ -51,7 +51,7 @@ func NewLoadBalancer(numWorkers int, basePort int) *LoadBalancer {
 			),
 		)
 		if err != nil {
-			log.Fatalf("did not connect to worker %d: %v", i+1, err)
+			log.Printf("did not connect to worker %d: %v", i+1, err)
 		}
 
 		client := pb.NewLBServiceClient(conn)
@@ -63,7 +63,7 @@ func NewLoadBalancer(numWorkers int, basePort int) *LoadBalancer {
 		req := &pb.WorkerIDRequest{} // No parameters needed
 		resp, err := client.GetWorkerID(ctx, req)
 		if err != nil {
-			log.Fatalf("failed to get worker ID for worker %d: %v", i+1, err)
+			log.Printf("failed to get worker ID for worker %d: %v", i+1, err)
 		}
 
 		workerID := resp.WorkerId.Value
