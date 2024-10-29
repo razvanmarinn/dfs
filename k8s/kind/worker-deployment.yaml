@@ -20,6 +20,13 @@ spec:
         env:
         - name: GRPC_PORT
           value: ":50051"
+        volumeMounts:
+        - name: worker-state-storage
+          mountPath: /data  # Mount path in the container
+      volumes:
+      - name: worker-state-storage
+        persistentVolumeClaim:
+          claimName: worker1-state-pvc 
 
 ---
 apiVersion: v1
@@ -57,6 +64,13 @@ spec:
         env:
         - name: GRPC_PORT
           value: ":50052" 
+        volumeMounts:
+        - name: worker-state-storage
+          mountPath: /data
+      volumes:
+      - name: worker-state-storage
+        persistentVolumeClaim:
+          claimName: worker2-state-pvc
 
 ---
 apiVersion: v1
@@ -94,6 +108,13 @@ spec:
         env:
         - name: GRPC_PORT
           value: ":50053"
+        volumeMounts:
+        - name: worker-state-storage
+          mountPath: /data
+      volumes:
+      - name: worker-state-storage
+        persistentVolumeClaim:
+          claimName: worker3-state-pvc
 ---
 apiVersion: v1
 kind: Service

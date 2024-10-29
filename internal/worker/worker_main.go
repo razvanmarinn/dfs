@@ -20,18 +20,14 @@ import (
 func main() {
 	log.Println("Starting worker node...")
 
-	// Initialize worker node state
 	state := nodes.NewWorkerNodeState()
 
-	// Load state from file
 	if err := state.LoadStateFromFile(); err != nil {
 		log.Fatalf("failed to load state: %v", err)
 	}
-
-	// Set up the gRPC server
 	address := os.Getenv("GRPC_PORT")
     if address == "" {
-        address = ":50051" // Default to 50051 if the environment variable is not set
+        address = ":50051" 
     }
 	lis, err := net.Listen("tcp", address)
 	if err != nil {
@@ -56,7 +52,6 @@ func main() {
 
 	state.SetID(worker.ID)
 
-	// Register both services
 	pb.RegisterLBServiceServer(grpcServer, worker)
 	master_pb.RegisterWorkerServiceServer(grpcServer, worker)
 
@@ -74,14 +69,12 @@ func main() {
 	var wg sync.WaitGroup
 	wg.Add(1)
 
-	// Ensure state is saved on shutdown
 	go func() {
 		defer wg.Done()
 		sig := <-sigs
 		log.Printf("Received signal: %v", sig)
 		log.Println("Shutting down worker node...")
 
-		// Save state
 		if _, err := state.UpdateState(worker); err != nil {
 			log.Printf("failed to update state: %v", err)
 		}

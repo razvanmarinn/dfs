@@ -39,18 +39,24 @@ func (w *WorkerNode) SaveBatch(batchID string) {
 
 	dataToSave := w.ReceivedBatches[batchID]
 
-	filePath := fmt.Sprintf("./batches/%s", batchID)
+	filePath := fmt.Sprintf("/data/batches/%s", batchID)
+
+	if err := os.MkdirAll("/data/batches", os.ModePerm); err != nil {
+		log.Print("Error creating directory: ", err)
+		return
+	}
 
 	f, err := os.Create(filePath + ".bin")
 	if err != nil {
-		log.Print("Error creating temp file: ", err)
+		log.Print("Error creating file in persistent storage: ", err)
+		return
 	}
+	defer f.Close()
+
 	err = binary.Write(f, binary.LittleEndian, dataToSave)
 	if err != nil {
-		log.Print("Error writing to file: ", err)
+		log.Print("Error writing to file in persistent storage: ", err)
 	}
-	f.Close()
-
 }
 
 func (w *WorkerNode) GetWorkerID(ctx context.Context, req *pb.WorkerIDRequest) (*pb.WorkerIDResponse, error) {

@@ -8,8 +8,8 @@ import (
 	"sync"
 )
 
-const workerStateFile = "worker_node_state.json"
-const masterStateFile = "master_node_state.json"
+const workerStateFile = "/data/worker_node_state.json"
+const masterStateFile = "/data/master_node_state.json"
 
 // WorkerNodeState represents the state of a worker node
 type WorkerNodeState struct {
