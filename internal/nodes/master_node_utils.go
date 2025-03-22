@@ -2,6 +2,7 @@ package nodes
 
 import (
 	"fmt"
+	"log"
 
 	pb "github.com/razvanmarinn/datalake/protobuf"
 
@@ -95,6 +96,9 @@ func (mn *MasterNode) CloseLoadBalancer() {
 }
 
 func (mn *MasterNode) RegisterFile(in *pb.ClientFileRequestToMaster) *FileMetadata {
+	log.Printf("Registering file %s\n", in.GetFileName())
+	log.Printf("File size: %d\n", in.GetFileSize())
+
 	fMetadata := &FileMetadata{
 		Name:           in.GetFileName(),
 		Size:           in.GetFileSize(),
@@ -117,6 +121,6 @@ func (mn *MasterNode) RegisterFile(in *pb.ClientFileRequestToMaster) *FileMetada
 
 		fMetadata.BatchLocations[batchUUID] = make([]uuid.UUID, 0)
 	}
-
+	log.Printf("File %s has been registered\n", fMetadata.Name)
 	return fMetadata
 }

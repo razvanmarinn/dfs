@@ -4,7 +4,7 @@ go 1.23.4
 
 require (
 	github.com/google/uuid v1.6.0
-	github.com/razvanmarinn/datalake v0.0.0-00010101000000-000000000000
+	github.com/razvanmarinn/datalake v0.0.0-20250322200900-4adb3eb93e03
 	google.golang.org/grpc v1.71.0
 
 )
@@ -17,4 +17,4 @@ require (
 	google.golang.org/protobuf v1.36.5 // indirect
 )
 
-replace github.com/razvanmarinn/datalake => /Users/marinrazvan/Developer/datalake
+// replace github.com/razvanmarinn/datalake => /Users/marinrazvan/Developer/datalake

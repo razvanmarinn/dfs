@@ -51,7 +51,7 @@ func main() {
 
 	state.SetID(worker.ID)
 
-	// pb.RegisterLBServiceServer(grpcServer, worker)
+	pb.RegisterLBServiceServer(grpcServer, worker)
 	// master_pb.RegisterWorkerServiceServer(grpcServer, worker)
 	pb.RegisterBatchReceiverServiceServer(grpcServer, worker)
 	go func() {

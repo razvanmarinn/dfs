@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"log"
 	"os"
-	pb "github.com/razvanmarinn/datalake/protobuf"
 
+	pb "github.com/razvanmarinn/datalake/protobuf"
 )
 
 func (wn *WorkerNode) Start() {
@@ -59,6 +59,7 @@ func (w *WorkerNode) SaveBatch(batchID string) {
 }
 
 func (w *WorkerNode) GetWorkerID(ctx context.Context, req *pb.WorkerIDRequest) (*pb.WorkerIDResponse, error) {
+	log.Printf("Received GetWorkerID request")
 	return &pb.WorkerIDResponse{
 		WorkerId: &pb.UUID{Value: w.ID},
 	}, nil
