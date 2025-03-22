@@ -1,9 +1,0 @@
-version: '3.7'  # Specify the Docker Compose file format version
-
-services:
-  master:
-    build:
-      context: .  # Path to the master node Dockerfile
-      dockerfile: Dockerfile.master
-    ports:
-      - "50055:50055"  # Expose port for gRPC server

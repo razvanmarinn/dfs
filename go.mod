@@ -1,17 +1,20 @@
 module github.com/razvanmarinn/dfs
 
-go 1.22.3
+go 1.23.4
 
 require (
 	github.com/google/uuid v1.6.0
-	github.com/razvanmarinn/rcss v0.0.2
-	google.golang.org/grpc v1.67.0
-	google.golang.org/protobuf v1.34.2
+	github.com/razvanmarinn/datalake v0.0.0-00010101000000-000000000000
+	google.golang.org/grpc v1.71.0
+
 )
 
 require (
-	golang.org/x/net v0.28.0 // indirect
-	golang.org/x/sys v0.24.0 // indirect
-	golang.org/x/text v0.17.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240814211410-ddb44dafa142 // indirect
+	golang.org/x/net v0.34.0 // indirect
+	golang.org/x/sys v0.29.0 // indirect
+	golang.org/x/text v0.21.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250115164207-1a7da9e5054f // indirect
+	google.golang.org/protobuf v1.36.5 // indirect
 )
+
+replace github.com/razvanmarinn/datalake => /Users/marinrazvan/Developer/datalake

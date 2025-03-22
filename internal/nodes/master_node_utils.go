@@ -3,7 +3,7 @@ package nodes
 import (
 	"fmt"
 
-	pb "github.com/razvanmarinn/rcss/proto"
+	pb "github.com/razvanmarinn/datalake/protobuf"
 
 	"github.com/google/uuid"
 	"github.com/razvanmarinn/dfs/internal/load_balancer"
@@ -95,29 +95,28 @@ func (mn *MasterNode) CloseLoadBalancer() {
 }
 
 func (mn *MasterNode) RegisterFile(in *pb.ClientFileRequestToMaster) *FileMetadata {
-    fMetadata := &FileMetadata{
-        Name:          in.GetFileName(),
-        Size:          in.GetFileSize(),
-        Hash:          uint32(in.GetHash()),
-        Batches:       make([]uuid.UUID, len(in.BatchInfo.Batches)),
-        BatchSizes:    make(map[uuid.UUID]int),
-        BatchLocations: make(map[uuid.UUID][]uuid.UUID),
-    }
+	fMetadata := &FileMetadata{
+		Name:           in.GetFileName(),
+		Size:           in.GetFileSize(),
+		Hash:           uint32(in.GetHash()),
+		Batches:        make([]uuid.UUID, len(in.BatchInfo.Batches)),
+		BatchSizes:     make(map[uuid.UUID]int),
+		BatchLocations: make(map[uuid.UUID][]uuid.UUID),
+	}
 
-    for i, batch := range in.BatchInfo.Batches {
+	for i, batch := range in.BatchInfo.Batches {
 
-        batchUUID, err := uuid.Parse(batch.Uuid)
-        if err != nil {
-            fmt.Printf("Error parsing batch UUID: %v\n", err)
-            continue 
-        }
+		batchUUID, err := uuid.Parse(batch.Uuid)
+		if err != nil {
+			fmt.Printf("Error parsing batch UUID: %v\n", err)
+			continue
+		}
 
-        fMetadata.Batches[i] = batchUUID
+		fMetadata.Batches[i] = batchUUID
 		fMetadata.BatchSizes[batchUUID] = int(batch.Size)
 
+		fMetadata.BatchLocations[batchUUID] = make([]uuid.UUID, 0)
+	}
 
-        fMetadata.BatchLocations[batchUUID] = make([]uuid.UUID, 0)
-    }
-
-    return fMetadata
+	return fMetadata
 }

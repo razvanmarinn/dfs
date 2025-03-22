@@ -7,7 +7,8 @@ import (
 	"sync"
 	"time"
 
-	pb "github.com/razvanmarinn/dfs/proto"
+	pb "github.com/razvanmarinn/datalake/protobuf"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -33,6 +34,7 @@ type LoadBalancer struct {
 	currentIdx int
 	mu         sync.Mutex
 }
+
 const workerAddress = "worker"
 const MAXIMUM_BATCHES_PER_WORKER = 100
 
@@ -43,7 +45,7 @@ func NewLoadBalancer(numWorkers int, basePort int) *LoadBalancer {
 
 	for i := 0; i < numWorkers; i++ {
 		conn, err := grpc.Dial(
-			fmt.Sprintf("%s-%d:%d",workerAddress, i+1, basePort+i),
+			fmt.Sprintf("%s-%d:%d", workerAddress, i+1, basePort+i),
 			grpc.WithTransportCredentials(insecure.NewCredentials()),
 			grpc.WithDefaultCallOptions(
 				grpc.MaxCallRecvMsgSize(64*1024*1024),
@@ -67,7 +69,7 @@ func NewLoadBalancer(numWorkers int, basePort int) *LoadBalancer {
 		}
 
 		workerID := resp.WorkerId.Value
-		wMetadata := NewWorkerMetadata(client,fmt.Sprintf("%s-%d", workerAddress, i+1), int32(basePort+i), 0)
+		wMetadata := NewWorkerMetadata(client, fmt.Sprintf("%s-%d", workerAddress, i+1), int32(basePort+i), 0)
 		lb.workerInfo[workerID] = *wMetadata
 		log.Printf("Successfully connected to worker node %d with UUID %s", i+1, workerID)
 	}

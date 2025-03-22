@@ -9,9 +9,8 @@ import (
 	"syscall"
 	"time"
 
+	pb "github.com/razvanmarinn/datalake/protobuf"
 	"github.com/razvanmarinn/dfs/internal/nodes"
-	pb "github.com/razvanmarinn/dfs/proto"
-	master_pb "github.com/razvanmarinn/rcss/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/keepalive"
@@ -26,9 +25,9 @@ func main() {
 		log.Fatalf("failed to load state: %v", err)
 	}
 	address := os.Getenv("GRPC_PORT")
-    if address == "" {
-        address = ":50051" 
-    }
+	if address == "" {
+		address = ":50051"
+	}
 	lis, err := net.Listen("tcp", address)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
@@ -52,9 +51,9 @@ func main() {
 
 	state.SetID(worker.ID)
 
-	pb.RegisterLBServiceServer(grpcServer, worker)
-	master_pb.RegisterWorkerServiceServer(grpcServer, worker)
-
+	// pb.RegisterLBServiceServer(grpcServer, worker)
+	// master_pb.RegisterWorkerServiceServer(grpcServer, worker)
+	pb.RegisterBatchReceiverServiceServer(grpcServer, worker)
 	go func() {
 		log.Println("Starting gRPC server...")
 		if err := grpcServer.Serve(lis); err != nil {

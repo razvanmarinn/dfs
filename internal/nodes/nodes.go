@@ -4,11 +4,10 @@ import (
 	"fmt"
 	"log"
 	"sync"
+	pb "github.com/razvanmarinn/datalake/protobuf"
 
 	"github.com/google/uuid"
 	"github.com/razvanmarinn/dfs/internal/load_balancer"
-	pb "github.com/razvanmarinn/dfs/proto"
-	master_pb "github.com/razvanmarinn/rcss/proto"
 )
 
 const fileBatchesTopic = "file-batches"
@@ -45,7 +44,7 @@ type WorkerNode struct {
 	lock            sync.Mutex
 	ReceivedBatches map[string][]byte
 	pb.UnimplementedLBServiceServer
-	master_pb.UnimplementedWorkerServiceServer
+	pb.UnimplementedBatchReceiverServiceServer
 }
 
 func NewMasterNode() *MasterNode {

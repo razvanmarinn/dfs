@@ -11,8 +11,9 @@ import (
 	"syscall"
 
 	"github.com/google/uuid"
+	pb "github.com/razvanmarinn/datalake/protobuf"
 	"github.com/razvanmarinn/dfs/internal/nodes"
-	pb "github.com/razvanmarinn/rcss/proto"
+
 	"google.golang.org/grpc"
 )
 
@@ -50,9 +51,9 @@ func (s *server) GetMetadata(ctx context.Context, in *pb.Location) (*pb.MasterMe
 	log.Printf("Received GetMetadata request for file: %v", in.GetFileName())
 
 	uuids := s.masterNode.GetFileBatches(in.GetFileName())
-	batches := make([]string, len(uuids))
+	batch_ids := make([]string, len(uuids))
 	for i, id := range uuids {
-		batches[i] = id.String()
+		batch_ids[i] = id.String()
 	}
 
 	batchLocations := make(map[string]*pb.BatchLocation)
@@ -81,7 +82,7 @@ func (s *server) GetMetadata(ctx context.Context, in *pb.Location) (*pb.MasterMe
 	}
 
 	return &pb.MasterMetadataResponse{
-		Batches:        batches,
+		BatchIds:        batch_ids,
 		BatchLocations: batchLocations,
 	}, nil
 }
