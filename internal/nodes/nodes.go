@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"sync"
+
 	pb "github.com/razvanmarinn/datalake/protobuf"
 
 	"github.com/google/uuid"
@@ -15,6 +16,14 @@ const acknowledgmentsTopic = "acknowledgments"
 
 var singleInstance *MasterNode
 var lock sync.Mutex
+
+type FileFormat string
+
+const (
+	FormatBinary  FileFormat = "binary"
+	FormatAvro    FileFormat = "avro"
+	FormatParquet FileFormat = "parquet"
+)
 
 type Node interface {
 	Start()
@@ -33,6 +42,7 @@ type FileMetadata struct {
 	Name           string                    `json:"name"`
 	Size           int64                     `json:"size"`
 	Hash           uint32                    `json:"hash"`
+	Format         FileFormat                `json:"format"`
 	Batches        []uuid.UUID               `json:"batches"` // list of all the batches for this file in UUID
 	BatchSizes     map[uuid.UUID]int         `json:"batchSizes"`
 	BatchLocations map[uuid.UUID][]uuid.UUID `json:"batchLocations"` // mapping from the uuid of the batches to the UUUID of the

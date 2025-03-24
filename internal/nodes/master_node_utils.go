@@ -98,11 +98,13 @@ func (mn *MasterNode) CloseLoadBalancer() {
 func (mn *MasterNode) RegisterFile(in *pb.ClientFileRequestToMaster) *FileMetadata {
 	log.Printf("Registering file %s\n", in.GetFileName())
 	log.Printf("File size: %d\n", in.GetFileSize())
+	log.Printf("File format %s\n", in.GetFileFormat())
 
 	fMetadata := &FileMetadata{
 		Name:           in.GetFileName(),
 		Size:           in.GetFileSize(),
 		Hash:           uint32(in.GetHash()),
+		Format:         FileFormat(in.GetFileFormat()),
 		Batches:        make([]uuid.UUID, len(in.BatchInfo.Batches)),
 		BatchSizes:     make(map[uuid.UUID]int),
 		BatchLocations: make(map[uuid.UUID][]uuid.UUID),
