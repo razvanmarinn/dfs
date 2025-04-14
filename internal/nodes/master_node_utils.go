@@ -12,7 +12,7 @@ import (
 
 const batchDir = "batch_data"
 
-func (mn *MasterNode) GetFiles() []FileMetadata {
+func (mn *MasterNode) GetFilesForProjectOfClient(cl Client, prj Project) []FileMetadata {
 	mn.lock.Lock()
 	defer mn.lock.Unlock()
 	return mn.FileRegistry

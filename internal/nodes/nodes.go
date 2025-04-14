@@ -33,10 +33,22 @@ type Node interface {
 
 type MasterNode struct {
 	ID           string
-	FileRegistry []FileMetadata
+	Clients    map[uuid.UUID]*Client
 	LoadBalancer *load_balancer.LoadBalancer
 	lock         sync.Mutex
 }
+
+
+type Client struct {
+	ID       uuid.UUID
+	Projects map[string]*Project
+}
+
+type Project struct {
+	Name   string
+	Files []*FileMetadata
+}
+
 
 type FileMetadata struct {
 	Name           string                    `json:"name"`
@@ -60,7 +72,7 @@ type WorkerNode struct {
 func NewMasterNode() *MasterNode {
 	return &MasterNode{
 		ID:           uuid.New().String(),
-		FileRegistry: make([]FileMetadata, 0),
+		Clients: make(map[uuid.UUID]*Client, 0),
 	}
 }
 
