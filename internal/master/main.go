@@ -29,8 +29,7 @@ type server struct {
 
 func (s *server) RegisterFile(ctx context.Context, in *pb.ClientFileRequestToMaster) (*pb.MasterFileResponse, error) {
 	fm := s.masterNode.RegisterFile(in)
-	// print FileMetadata
-	log.Printf("FileMetadata: %v\n", fm)
+
 	s.masterNode.FileRegistry = append(s.masterNode.FileRegistry, *fm)
 	return &pb.MasterFileResponse{Success: true}, nil
 }

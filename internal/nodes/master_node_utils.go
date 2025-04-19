@@ -10,14 +10,6 @@ import (
 	"github.com/razvanmarinn/dfs/internal/load_balancer"
 )
 
-const batchDir = "batch_data"
-
-func (mn *MasterNode) GetFilesForProjectOfClient(cl Client, prj Project) []FileMetadata {
-	mn.lock.Lock()
-	defer mn.lock.Unlock()
-	return mn.FileRegistry
-}
-
 func (mn *MasterNode) GetFileBatches(file string) []uuid.UUID {
 	mn.lock.Lock()
 	defer mn.lock.Unlock()
@@ -102,6 +94,8 @@ func (mn *MasterNode) RegisterFile(in *pb.ClientFileRequestToMaster) *FileMetada
 
 	fMetadata := &FileMetadata{
 		Name:           in.GetFileName(),
+		OwnerID:        in.GetOwnerId(),
+		ProjectID:      in.GetProjectId(),
 		Size:           in.GetFileSize(),
 		Hash:           uint32(in.GetHash()),
 		Format:         FileFormat(in.GetFileFormat()),

@@ -123,13 +123,12 @@ func (w *WorkerNodeState) LoadStateFromFile() error {
 	}
 	defer file.Close()
 
-	data := make([]byte, 0)
 	stat, err := file.Stat()
 	if err != nil {
 		return err
 	}
 
-	data = make([]byte, stat.Size())
+	data := make([]byte, stat.Size())
 	_, err = file.Read(data)
 	if err != nil {
 		return err
@@ -210,13 +209,12 @@ func (w *MasterNodeState) LoadStateFromFile() error {
 	}
 	defer file.Close()
 
-	data := make([]byte, 0)
 	stat, err := file.Stat()
 	if err != nil {
 		return err
 	}
 
-	data = make([]byte, stat.Size())
+	data := make([]byte, stat.Size())
 	_, err = file.Read(data)
 	if err != nil {
 		return err

@@ -11,8 +11,6 @@ import (
 	"github.com/razvanmarinn/dfs/internal/load_balancer"
 )
 
-const fileBatchesTopic = "file-batches"
-const acknowledgmentsTopic = "acknowledgments"
 
 var singleInstance *MasterNode
 var lock sync.Mutex
@@ -33,25 +31,15 @@ type Node interface {
 
 type MasterNode struct {
 	ID           string
-	Clients    map[uuid.UUID]*Client
+	FileRegistry []FileMetadata
 	LoadBalancer *load_balancer.LoadBalancer
 	lock         sync.Mutex
 }
 
-
-type Client struct {
-	ID       uuid.UUID
-	Projects map[string]*Project
-}
-
-type Project struct {
-	Name   string
-	Files []*FileMetadata
-}
-
-
 type FileMetadata struct {
 	Name           string                    `json:"name"`
+	OwnerID        string                    `json:"ownerId"`
+	ProjectID      string                    `json:"projectId"`
 	Size           int64                     `json:"size"`
 	Hash           uint32                    `json:"hash"`
 	Format         FileFormat                `json:"format"`
@@ -72,7 +60,7 @@ type WorkerNode struct {
 func NewMasterNode() *MasterNode {
 	return &MasterNode{
 		ID:           uuid.New().String(),
-		Clients: make(map[uuid.UUID]*Client, 0),
+		FileRegistry: make([]FileMetadata, 0),
 	}
 }
 
