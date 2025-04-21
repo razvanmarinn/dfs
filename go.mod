@@ -4,7 +4,7 @@ go 1.23.4
 
 require (
 	github.com/google/uuid v1.6.0
-	github.com/razvanmarinn/datalake v0.0.0-20250324203917-b68901054179
+	github.com/razvanmarinn/datalake v0.0.0-20250419165818-5816982cb1b0
 	google.golang.org/grpc v1.71.0
 
 )
